@@ -17,6 +17,8 @@ int main()
   LED_DDR |= (1 << LED_NR); //led
   LED_PORT |= (1 << LED_NR);
 
+
+
 /* 
   //timer
   TCCR0A |= (1<<WGM01);           //CTC
