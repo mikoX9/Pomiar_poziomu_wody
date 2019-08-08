@@ -1,4 +1,5 @@
 #include "../lib/ultra.h"
+#include "../lib/rs232.h"
 
 
 volatile uint16_t distance;
@@ -6,7 +7,7 @@ volatile uint8_t measure_flag;
 
 void ultra_init()
 {
-    
+
    DDRB &=~(1<<PB0);  //ICP1
    //PORTB |=(1<<PB0);
 
@@ -23,9 +24,9 @@ void ultra_init()
 uint16_t measure()
 {
     measure_flag = 0;
-     PORTB |=(1<<PB1);
+    PORT(TRIG_PORT) |=(1<<TRIG_PIN);
     _delay_us(10);
-    PORTB &=~(1<<PB1);
+    PORT(TRIG_PORT) &=~(1<<TRIG_PIN);
     while( !measure_flag );
 
     return distance;
@@ -34,6 +35,7 @@ uint16_t measure()
 
 ISR( TIMER1_CAPT_vect )
 {
+
   static uint16_t start;
   static uint8_t licznik = 1;
   static uint32_t value;
@@ -50,7 +52,6 @@ ISR( TIMER1_CAPT_vect )
     value = ICR1 - start;
     distance = (((value/2)*34)/2000);
     measure_flag = 1;
-    PORTB ^=(1<<PD5);
     licznik = 1;
   }
 }

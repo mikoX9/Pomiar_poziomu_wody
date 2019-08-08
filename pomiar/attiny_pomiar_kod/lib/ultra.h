@@ -19,7 +19,7 @@
 /*****************************************/
 
 #define TRIG_PIN    1
-#define TRIG_PORT   B
+#define TRIG_PORT   A
 
 extern volatile uint16_t distance;
 
