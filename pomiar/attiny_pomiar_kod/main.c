@@ -42,39 +42,6 @@ int main()
 
   while (1)
   {
-    /*
-    if( !timer1 )
-    {
-
-
-
-      tmp_value = measure();
-      LED_ON;
-      _delay_ms(12);
-      LED_OFF;
-
-      if( tmp_value<200 && tmp_value>1)
-      {
-        uart_putc('h');    //beginning of the frame
-
-        //*********************  DATA  ***********************
-        uart_putc( tmp_value ); //entire value
-        //******************************************************
-
-        uart_putc('t');  //end of the frame
-
-        //LED_PORT ^=(1<<LED_NR);
-
-        timer1 = 3000;
-      }
-      else
-      {
-        timer1 = 100;
-      }
-
-    }
-*/
-
     if( uart_getc() == 1)   //request for send a measurement
     {
       send_measure( execute_measurement() );
