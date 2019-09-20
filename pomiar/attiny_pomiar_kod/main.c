@@ -5,6 +5,7 @@
 
 
 #define NOM 3 //number of measurements in one serie
+#define DBM 100 //delay beetwen measurements  !!!! >12 !!!!
 
 #define LED_DDR   DDRD
 #define LED_PORT  PORTD
@@ -14,7 +15,7 @@
 
 volatile uint16_t timer1 = 0;
 
-void blikn_led(const int delay);
+void blikn_led(int delay);
 void send_measure( uint8_t value);
 uint8_t execute_measurement();
 
@@ -96,6 +97,8 @@ uint8_t execute_measurement()
     {
       tmp_value = measure();
       blikn_led(12);
+      _delay_ms(DBM - 12);
+
     }
     while( !(tmp_value > 0 || tmp_value < 200));
 
@@ -103,7 +106,7 @@ uint8_t execute_measurement()
   }
 
 
-  return sum_value/NOM;
+  return (sum_value / NOM);
 }
 
 
@@ -116,10 +119,14 @@ void send_measure( uint8_t value)
   uart_putc('t');  //end of the frame
 }
 
-void blikn_led(const int delay)
+void blikn_led(int delay)
 {
   LED_ON;
-  _delay_ms(12);
+  while (0 < delay)
+  {
+    _delay_ms(1);
+    --delay;
+  }
   LED_OFF;
 }
 

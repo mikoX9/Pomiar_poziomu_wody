@@ -34,8 +34,15 @@
 #define BUTTON_PIN  PIND
 #define BUTTON_NR   2         //INT0
 
+/***********************   LIMITS    **************************/
+#define RED_LIMIT     25
+#define ORAGNE_LIMIT  50
+
+/**************************************************************/
+
 
 void diode_update( uint8_t val );
+void blink_led( int delay);
 void led_off(void);
 void sleep_mode();
 void wakeup_mode();
@@ -64,7 +71,6 @@ int main()
   ORANGE_OFF;
   RED_OFF;
   GREEN_OFF;
-
 
   BUTTON_DDR  &=~(1<<BUTTON_NR);
   BUTTON_PORT |= (1<<BUTTON_NR);
@@ -102,8 +108,10 @@ int main()
         EIMSK |=(1<<INT0);   //frame ends so ext interrupts are allowed
 
         wakeup_mode();
-        _delay_ms(2000);
+        _delay_ms(3000);
         sleep_mode();
+
+        EIMSK |= (1<<INT0); //enabling interrupt
       }
 
     }
@@ -115,12 +123,16 @@ int main()
 
 ISR( 	INT0_vect )
 {
+  EIMSK &=~ (1<<INT0);  //disabling interrupt
   _delay_ms(70);
   if( !(BUTTON_PIN & (1<<BUTTON_NR)) )
   {
     uart_putc( 1 ); //request to refresh measurements
-    LED_PORT ^=(1<<LED_NR);
+    blink_led( 50 );
+    _delay_ms(200);
   }
+  else
+    EIMSK |= (1<<INT0); //enabling interrupt
 }
 
 void sleep_mode()
@@ -136,13 +148,13 @@ void wakeup_mode()
 
 void diode_update( uint8_t val)
 {
-  if( val < 20 )
+  if( val < RED_LIMIT )
   {
     ORANGE_OFF;
     RED_ON;
     GREEN_OFF;
   }
-  else if( val< 38)
+  else if( val< ORAGNE_LIMIT)
   {
     ORANGE_ON;
     RED_OFF;
@@ -161,4 +173,15 @@ void led_off(void)
   ORANGE_OFF;
   GREEN_OFF;
   RED_OFF;
+}
+
+void blink_led( int delay)
+{
+  LED_PORT |=(1<<LED_NR);
+  while (0 < delay)
+  {
+    _delay_ms(1);
+    --delay;
+  }
+  LED_PORT &=~(1<<LED_NR);
 }
