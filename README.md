@@ -1,3 +1,3 @@
-# Projekt Pomiar poziomu wody w studni
+# Projekt: pomiar poziomu wody w studni
 
 by Mikolaj Przybylak
