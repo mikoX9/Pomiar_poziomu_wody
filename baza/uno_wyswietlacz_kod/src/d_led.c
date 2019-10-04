@@ -2,8 +2,8 @@
 #include <avr/interrupt.h>
 #include "../lib/d_led.h"
 
-volatile uint8_t cy1;	
-volatile uint8_t cy2;		
+volatile uint8_t cy1;
+volatile uint8_t cy2;
 volatile uint8_t cy3;
 volatile uint8_t cy4;
 
@@ -23,9 +23,28 @@ const uint8_t liczby[11]=                 //zapisywanie do pamieci FLASH, tablic
 };
 
 
+void dispaly_off(void)
+{
+	TIMSK0 &=~ (1<<OCIE0A);
+
+	SEG_A_OFF;
+	SEG_B_OFF;
+	SEG_C_OFF;
+	SEG_D_OFF;
+	SEG_E_OFF;
+	SEG_F_OFF;
+	SEG_G_OFF;
+
+}
+
+void dispaly_on(void)
+{
+	TIMSK0 |= (1<<OCIE0A);
+}
+
 void d_led_init(void)
 {
-	DDR(SEG_A_PORT)   |=(1<<SEG_A_PIN);
+	  DDR(SEG_A_PORT)   |=(1<<SEG_A_PIN);
     DDR(SEG_B_PORT)   |=(1<<SEG_B_PIN);
     DDR(SEG_C_PORT)   |=(1<<SEG_C_PIN);
     DDR(SEG_D_PORT)   |=(1<<SEG_D_PIN);
@@ -47,17 +66,10 @@ void d_led_init(void)
 	TIMSK0 |= (1<<OCIE0A);	//zezwolenie na przerwania od porownania z rejestrem OCR0A
 }
 
-void display(char c1, char c2, char c3, char c4)
-{
-    	cy1 = c1 ;
-		cy2 = c2 ;
-		cy3 = c3 ;
-		cy4 = c4 ;
-}
 
 void display(uint16_t number)
 {
-    	cy1= number/1000;
+    cy1= number/1000;
 		cy2= (number%1000)/100;
 		cy3= (number%100)/10;
 		cy4= number%10;
@@ -208,43 +220,62 @@ ISR(TIMER0_COMPA_vect)
             SEG_F_OFF;
             SEG_G_OFF;
             break;
-        
+
     }
-#else
+#else  			//dla wspolnej katody
 
     if(licznik==1)
     {
-        COM_1_OFF;
+      /*  COM_1_OFF; //uruchamiane zerem
         COM_2_ON;
         COM_3_ON;
         COM_4_ON;
+*/
+				COM_1_ON;		//uruchamiane jedynka, dla tranzysotra npn
+				COM_2_OFF;
+				COM_3_OFF;
+				COM_4_OFF;
 
-        cyfra = cy1;
+				cyfra = cy1;
     }else
     if(licznik==2)
     {
-        COM_1_ON;
+        /*COM_1_ON;
         COM_2_OFF;
         COM_3_ON;
-        COM_4_ON;
+        COM_4_ON;*/
+
+				COM_1_OFF;
+        COM_2_ON;
+        COM_3_OFF;
+        COM_4_OFF;
 
         cyfra = cy2;
     }else
     if(licznik==3)
     {
-        COM_1_ON;
+      /*  COM_1_ON;
         COM_2_ON;
         COM_3_OFF;
-        COM_4_ON;
+        COM_4_ON;*/
+				COM_1_OFF;
+	      COM_2_OFF;
+	      COM_3_ON;
+	      COM_4_OFF;
 
         cyfra = cy3;
     }else
     if(licznik==4)
     {
-        COM_1_ON;
+      /*  COM_1_ON;
         COM_2_ON;
         COM_3_ON;
-        COM_4_OFF;
+        COM_4_OFF;*/
+
+				COM_1_OFF;
+        COM_2_OFF;
+        COM_3_OFF;
+        COM_4_ON;
 
         cyfra = cy4;
     }
@@ -343,13 +374,13 @@ ISR(TIMER0_COMPA_vect)
             SEG_F_ON;
             SEG_G_ON;
             break;
-        
+
     }
 #endif
 
 
 
     licznik++;
-    
+
 
 }
